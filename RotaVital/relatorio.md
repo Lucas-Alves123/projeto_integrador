@@ -15,11 +15,16 @@ As requisições foram testadas na API local com `100.000` registros.
 | Paralelo | 4 | 2505 | 3.87x |
 | Paralelo | 8 | 1896 | 5.28x |
 
+### Gráfico de Tempo de Resposta vs Threads
+*(Dica: Se o seu leitor de Markdown não renderizar o gráfico abaixo, você pode gerar um gráfico de barras simples no Excel com os dados da tabela acima para colocar no PDF).*
+
+```mermaid
+xychart-beta
+    title "Tempo de Resposta por Número de Threads"
+    x-axis ["1 Thread (Seq)", "2 Threads", "4 Threads", "8 Threads"]
+    y-axis "Tempo (ms)" 0 --> 10000
+    bar [9892, 4835, 2505, 1896]
+```
+
 ## 3. Análise Final
-O ganho de performance (*speedup*) tende a ser quase **linear**, mas estabiliza quando atinge o limite de núcleos físicos/lógicos do processador da máquina. A Big-O não mudou: a complexidade total continua sendo $O(N)$, a diferença é que o tempo de parede (Wall-Clock Time) cai porque dividimos os passos entre múltiplos trabalhadores simultâneos.
-
-**Concorrência vs Paralelismo:**
-Na *Mesa DJ (Threads I)* nós usamos **Concorrência**: tínhamos múltiplos instrumentos esperando por comandos aleatórios do usuário, ou seja, gerenciamos várias tarefas diferentes que concorriam pela atenção do sistema. Aqui no *Rota Vital*, usamos **Paralelismo**: pegamos uma única tarefa gigante (volume de dados) e quebramos em partes para serem executadas matematicamente ao mesmo tempo, focando puramente em velocidade. 
-
-**Como a arquitetura pode evoluir?**
-Quando 8 threads (ou até o limite da máquina) não bastarem, o paralelismo vertical esgota. A arquitetura precisará evoluir para o **Processamento Distribuído** (Escalabilidade Horizontal), separando o trabalho não apenas em Threads na mesma máquina, mas entre múltiplos Servidores em nuvem usando filas (como RabbitMQ/Kafka) ou processamento em lote com Spark.
+Analisando os resultados, observamos que o ganho de performance (speedup) foi quase linear no salto de 1 para 2 e 4 threads (atingindo 3.87x), mas deixou de ser estritamente linear ao passar para 8 threads (5.28x). Isso ocorre porque o paralelismo físico encontra seu teto no número real de núcleos do processador da máquina, passando a sofrer com *context switching* e o limite de hardware. Apesar do ganho drástico de tempo (Wall-Clock Time), a Big-O do algoritmo não mudou; a complexidade da operação matemática continua sendo $O(N)$ em relação ao tamanho da entrada, a única diferença é que fatiamos o $N$ entre múltiplos trabalhadores que operam simultaneamente. Esse cenário ilustra perfeitamente a diferença entre Concorrência e Paralelismo: enquanto na Mesa DJ (Concorrência) as threads serviam para atender eventos simultâneos independentes (ouvir o teclado do usuário enquanto a música toca, pausando estados sem travamento), aqui no Rota Vital (Paralelismo) usamos as threads unicamente para acelerar um alto volume computacional de uma mesma tarefa. Por fim, quando nem mesmo 8 ou mais threads bastarem para o Rota Vital, o limite do paralelismo vertical (na mesma máquina) terá sido atingido. Para evoluir, a arquitetura precisará adotar o Processamento Distribuído (Escalabilidade Horizontal), pulverizando essas fatias de dados entre múltiplos servidores independentes através de mensageria (Kafka/RabbitMQ) ou processamento em lote (Apache Spark).
