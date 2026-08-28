@@ -48,4 +48,3 @@ O objetivo aqui é puramente performático: a API executa a mesma tarefa gigante
 - Na **Mesa DJ (Concorrência)**, nós gerenciamos várias tarefas diferentes que concorriam pela atenção do sistema (tocar música, ler teclado, pausar), lidando com estados sem quebrar.
 - No **Rota Vital (Paralelismo)**, pegamos uma única tarefa gigante de dados e quebramos em partes para serem executadas matematicamente ao mesmo tempo, focando puramente em velocidade.
 
-Feito com 💙 para a disciplina de Sistemas Distribuídos / Programação Multithread.

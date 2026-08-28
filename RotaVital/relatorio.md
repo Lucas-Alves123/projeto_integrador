@@ -10,12 +10,10 @@ As requisições foram testadas na API local com `100.000` registros.
 
 | Versão | Threads | Tempo de Resposta (ms) | Speedup (Ganho) |
 | :--- | :--- | :--- | :--- |
-| Sequencial | 1 | (Será medido na API) | 1.0x (Base) |
-| Paralelo | 2 | (Será medido na API) | ~2.0x |
-| Paralelo | 4 | (Será medido na API) | ~4.0x |
-| Paralelo | 8 | (Será medido na API) | ~8.0x |
-
-*(Nota: Execute o endpoint `/api/processamento/estoque` para preencher os tempos reais no seu computador).*
+| Sequencial | 1 | 9892 | 1.0x (Base) |
+| Paralelo | 2 | 4835 | 2.01x |
+| Paralelo | 4 | 2505 | 3.87x |
+| Paralelo | 8 | 1896 | 5.28x |
 
 ## 3. Análise Final
 O ganho de performance (*speedup*) tende a ser quase **linear**, mas estabiliza quando atinge o limite de núcleos físicos/lógicos do processador da máquina. A Big-O não mudou: a complexidade total continua sendo $O(N)$, a diferença é que o tempo de parede (Wall-Clock Time) cai porque dividimos os passos entre múltiplos trabalhadores simultâneos.
