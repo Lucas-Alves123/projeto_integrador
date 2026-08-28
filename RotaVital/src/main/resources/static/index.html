@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Rota Vital</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --bg-color: #0f172a;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top left, #1e1b4b, var(--bg-color));
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 50px;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-run:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-run:active {
+            transform: translateY(1px);
+        }
+
+        .btn-run:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Glassmorphism Cards */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .results-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .card .time {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #38bdf8;
+        }
+
+        .card .speedup {
+            font-size: 1.2rem;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .seq-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+        }
+        
+        .seq-card .time {
+            color: #fb923c;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            margin: 40px auto;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #60a5fa;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard Rota Vital</h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem;">Análise de Paralelismo: Validação Cruzada de Estoque</p>
+            <br>
+            <button id="runBtn" class="btn-run" onclick="runBenchmark()">Iniciar Medições (100.000 registros)</button>
+        </header>
+
+        <div id="loader" class="loader"></div>
+        <p id="loadingText" style="display:none; text-align:center; color: var(--text-muted);">Isso vai exigir bastante do processador... aguarde cerca de 10 segundos.</p>
+
+        <div id="results" class="results-grid">
+            <div class="card seq-card">
+                <h3>Processamento Sequencial (1 Thread)</h3>
+                <div class="time" id="t-seq">-- ms</div>
+                <div class="speedup">Base (1.0x)</div>
+            </div>
+            <div class="card">
+                <h3>Paralelo (2 Threads)</h3>
+                <div class="time" id="t-par2">-- ms</div>
+                <div class="speedup" id="s-par2">--x</div>
+            </div>
+            <div class="card">
+                <h3>Paralelo (4 Threads)</h3>
+                <div class="time" id="t-par4">-- ms</div>
+                <div class="speedup" id="s-par4">--x</div>
+            </div>
+            <div class="card">
+                <h3>Paralelo (8 Threads)</h3>
+                <div class="time" id="t-par8">-- ms</div>
+                <div class="speedup" id="s-par8">--x</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function runBenchmark() {
+            const btn = document.getElementById('runBtn');
+            const loader = document.getElementById('loader');
+            const loadingText = document.getElementById('loadingText');
+            const resultsDiv = document.getElementById('results');
+
+            // Reset UI
+            btn.disabled = true;
+            btn.innerText = "Processando...";
+            resultsDiv.classList.remove('visible');
+            loader.style.display = "block";
+            loadingText.style.display = "block";
+
+            try {
+                // Chama a API do Spring Boot
+                const response = await fetch('/api/processamento/estoque');
+                const data = await response.json();
+
+                // Atualiza os cards
+                document.getElementById('t-seq').innerText = data['1_Tempo_Sequencial_ms'] + ' ms';
+                document.getElementById('t-par2').innerText = data['2_Tempo_Paralelo_2_Threads_ms'] + ' ms';
+                document.getElementById('s-par2').innerText = data['Speedup_2_Threads'];
+                
+                document.getElementById('t-par4').innerText = data['3_Tempo_Paralelo_4_Threads_ms'] + ' ms';
+                document.getElementById('s-par4').innerText = data['Speedup_4_Threads'];
+                
+                document.getElementById('t-par8').innerText = data['4_Tempo_Paralelo_8_Threads_ms'] + ' ms';
+                document.getElementById('s-par8').innerText = data['Speedup_8_Threads'];
+
+                // Mostra os resultados
+                resultsDiv.classList.add('visible');
+            } catch (error) {
+                alert("Erro ao conectar com a API. Certifique-se de que o servidor Spring Boot está rodando.");
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Executar Novamente";
+                loader.style.display = "none";
+                loadingText.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

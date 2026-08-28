@@ -1,0 +1,13 @@
+Para que a Mesa DJ toque som de verdade, siga estes passos:
+
+1. Baixe arquivos de áudio em formato ".wav" dos sites de STEMS que você me enviou.
+2. Renomeie os arquivos e coloque-os nesta pasta com os nomes exatos:
+   - bateria.wav
+   - baixo.wav
+   - synth.wav
+
+Se você não colocar os arquivos aqui, o programa ainda vai funcionar normalmente no console mostrando o painel ao vivo, mas sem emitir som.
+
+Dica: Você pode adicionar novos instrumentos enquanto a música toca! 
+Basta colocar o arquivo aqui (ex: guitarra.wav) e digitar no console:
+add guitarra audio/guitarra.wav
