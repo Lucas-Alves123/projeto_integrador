@@ -1,5 +1,6 @@
 @echo off
 cls
+cd /d "%~dp0"
 java -cp . src.DjApp
 if %errorlevel% neq 0 (
     echo.

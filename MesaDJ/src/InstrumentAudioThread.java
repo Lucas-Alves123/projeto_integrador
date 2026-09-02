@@ -24,6 +24,7 @@ public class InstrumentAudioThread implements Runnable {
         try {
             File audioFile = new File(audioFilePath);
             if (!audioFile.exists()) {
+                System.out.println("\n[AVISO] Arquivo de áudio não encontrado: " + audioFile.getAbsolutePath() + "\n");
                 return;
             }
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
@@ -78,6 +79,21 @@ public class InstrumentAudioThread implements Runnable {
     public void setBpm(int bpm) {
         if (bpm > 0) {
             this.bpm = bpm;
+        }
+    }
+    
+    public void setVolume(int volume) {
+        if (clip != null && clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            if (volume < 0) volume = 0;
+            if (volume > 100) volume = 100;
+            
+            float min = gainControl.getMinimum();
+            float max = gainControl.getMaximum();
+            float range = max - min;
+            float gain = (range * (volume / 100.0f)) + min;
+            
+            gainControl.setValue(gain);
         }
     }
     

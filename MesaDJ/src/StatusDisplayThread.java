@@ -14,7 +14,7 @@ public class StatusDisplayThread implements Runnable {
     public void run() {
         while (running) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(20000); // Atualiza a cada 20 segundos
                 
                 System.out.println("\n\n=== [ PAINEL AO VIVO DA MESA DJ ] ===");
                 for (Map.Entry<String, InstrumentAudioThread> entry : instruments.entrySet()) {
@@ -22,7 +22,7 @@ public class StatusDisplayThread implements Runnable {
                     System.out.println(" > " + entry.getKey().toUpperCase() + " : " + status);
                 }
                 System.out.println("=======================================");
-                System.out.println("Comandos: play <inst>, pause <inst>, add <inst> <arq>, bpm <inst> <valor>, exit");
+                System.out.println("Comandos: play <inst>, pause <inst>, add <inst> <arq>, bpm <inst> <valor>, volume <inst> <0-100>, exit");
                 System.out.print("DJ> ");
                 
             } catch (InterruptedException e) {

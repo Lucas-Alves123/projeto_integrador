@@ -11,9 +11,9 @@ public class DjApp {
         System.out.println("=== Bem-vindo a Mesa DJ (Simulador Multithread) ===");
         System.out.println("Para ouvir áudio real, coloque arquivos .wav na pasta 'audio'!");
         
-        addInstrument("bateria", "audio/bateria.wav");
-        addInstrument("baixo", "audio/baixo.wav");
-        addInstrument("synth", "audio/synth.wav");
+        String audioDir = new java.io.File("MesaDJ/audio").exists() ? "MesaDJ/audio/" : "audio/";
+        addInstrument("bateria", audioDir + "bateria.wav");
+        addInstrument("baixo", audioDir + "baixo.wav");
         
         StatusDisplayThread statusThread = new StatusDisplayThread(instruments);
         Thread statusDisplay = new Thread(statusThread);
@@ -53,7 +53,16 @@ public class DjApp {
                     } catch (NumberFormatException e) {
                         System.out.println("BPM inválido.");
                     }
+                } else if (command.equals("volume") && parts.length >= 3) {
+                    try {
+                        int vol = Integer.parseInt(parts[2]);
+                        if (inst != null) inst.setVolume(vol);
+                    } catch (NumberFormatException e) {
+                        System.out.println("[ERRO] Volume inválido. Use um número de 0 a 100.");
+                    }
                 }
+            } else if (!input.isEmpty()) {
+                System.out.println("[ERRO] Comando incompleto. Tente algo como: play baixo, ou volume bateria 50.");
             }
         }
         
