@@ -14,9 +14,13 @@ public class StatusDisplayThread implements Runnable {
     public void run() {
         while (running) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(2000); // Atualiza a cada 2 segundos
                 
-                System.out.println("\n\n=== [ PAINEL AO VIVO DA MESA DJ ] ===");
+                // Limpa o console (funciona na maioria dos terminais)
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+                
+                System.out.println("=== [ PAINEL AO VIVO DA MESA DJ ] ===");
                 for (Map.Entry<String, InstrumentAudioThread> entry : instruments.entrySet()) {
                     String status = entry.getValue().isPlaying() ? "[TOCANDO]" : "[PAUSADO]";
                     System.out.println(" > " + entry.getKey().toUpperCase() + " : " + status);

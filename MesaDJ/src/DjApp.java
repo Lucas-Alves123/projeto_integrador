@@ -1,11 +1,11 @@
 package src;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class DjApp {
-    private static final Map<String, InstrumentAudioThread> instruments = new HashMap<>();
+    private static final Map<String, InstrumentAudioThread> instruments = new ConcurrentHashMap<>();
     
     public static void main(String[] args) {
         System.out.println("=== Bem-vindo a Mesa DJ (Simulador Multithread) ===");
